@@ -1,7 +1,6 @@
 import { experience } from '../data/experience';
 import { profile } from '../data/home';
-// import { substackPosts } from '../data/projects';
-import { Projects } from '../data/projects';
+import { projects } from '../data/projects';
 
 const SITE = 'https://shouryatiwaryy.github.io';
 
@@ -25,7 +24,11 @@ function formatDate(iso: string): string {
 export async function buildLlmsTxt(): Promise<string> {
   const generated = new Date(
     import.meta.env.PUBLIC_SITE_UPDATED || Date.now()
-  ).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  ).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   const sections: string[] = [
     `# ${profile.name}`,
@@ -36,6 +39,7 @@ export async function buildLlmsTxt(): Promise<string> {
     `Generated: ${generated}`,
     '',
     '---',
+
     block(
       'Home',
       [
@@ -49,12 +53,9 @@ export async function buildLlmsTxt(): Promise<string> {
         '### Links',
         '',
         bullets(profile.links.map((l) => `${l.label}: ${l.url}`)),
-        '',
-        '### Open-source contributions',
-        '',
-        bullets(profile.openSourceContributions.map((c) => `${c.name}: ${c.url}`)),
       ].join('\n')
     ),
+
     block(
       'Experience',
       [
@@ -70,34 +71,23 @@ export async function buildLlmsTxt(): Promise<string> {
         ),
       ].join('\n\n')
     ),
+
     block(
       'Projects',
       [
         `URL: ${SITE}/projects`,
         '',
-        ...Projects.map((p) =>
+        ...projects.map((p) =>
           [
-            `### ${p.name}${p.made ? ` (${p.made})` : ''}`,
-            p.tagline,
-            `GitHub: ${p.github}`,
-            ...(p.liveLink ? [`Live: ${p.liveLink}`] : []),
-            ...(p.xPost ? [`Launch post: ${p.xPost}`] : []),
+            `### ${p.title}`,
+            `Category: ${p.category}`,
+            `Date: ${formatDate(p.date)}`,
+            ...(p.url ? [`URL: ${p.url}`] : []),
             '',
-            bullets(p.bullets),
+            p.summary,
           ].join('\n')
         ),
       ].join('\n\n')
-    ),
-    block(
-      'Writing (external)',
-      [
-        `URL: ${SITE}/blog`,
-        '',
-        ...substackPosts.map(
-          (post) =>
-            `- ${post.title} (${formatDate(post.date)}) — ${post.category}\n  ${post.summary}\n  ${post.url}`
-        ),
-      ].join('\n')
     ),
   ];
 
@@ -108,7 +98,6 @@ export async function buildLlmsTxt(): Promise<string> {
         `Home: ${SITE}/`,
         `Experience: ${SITE}/experience`,
         `Projects: ${SITE}/projects`,
-        `Writing: ${SITE}/blog`,
         `LLM digest: ${SITE}/llms.txt`,
       ])
     )
